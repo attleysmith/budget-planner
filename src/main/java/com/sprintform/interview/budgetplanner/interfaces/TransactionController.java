@@ -2,6 +2,7 @@ package com.sprintform.interview.budgetplanner.interfaces;
 
 import com.sprintform.interview.budgetplanner.application.TransactionService;
 import com.sprintform.interview.budgetplanner.application.model.TransactionInput;
+import com.sprintform.interview.budgetplanner.domain.model.Category;
 import com.sprintform.interview.budgetplanner.domain.model.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -37,7 +38,10 @@ public class TransactionController {
     }
 
     @GetMapping
-    public List<Transaction> listTransactions(@RequestParam(required = false) LocalDate startDate, @RequestParam(required = false) LocalDate endDate) {
-        return transactionService.listTransactions(startDate, endDate);
+    public List<Transaction> listTransactions(
+            @RequestParam(required = false) Category category,
+            @RequestParam(required = false) LocalDate startDate,
+            @RequestParam(required = false) LocalDate endDate) {
+        return transactionService.listTransactions(category, startDate, endDate);
     }
 }
