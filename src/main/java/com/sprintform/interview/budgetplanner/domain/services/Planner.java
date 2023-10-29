@@ -44,7 +44,7 @@ public class Planner {
         return BudgetPlan.builder()
                 .startDate(baseDate)
                 .endDate(baseDate.plusDays(PREDICTED_DAYS - 1))
-                .plan(transactionList.stream().collect(
+                .details(transactionList.stream().collect(
                         groupingBy(Transaction::getCategory,
                                 groupingBy(Transaction::getCurrency,
                                         collectingAndThen(

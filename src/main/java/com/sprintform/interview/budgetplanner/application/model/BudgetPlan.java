@@ -14,5 +14,5 @@ public class BudgetPlan {
 
     private LocalDate startDate;
     private LocalDate endDate;
-    private Map<Category, Map<Currency, Integer>> plan;
+    private Map<Category, Map<Currency, Integer>> details;
 }
