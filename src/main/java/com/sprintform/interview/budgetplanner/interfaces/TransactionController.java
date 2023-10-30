@@ -2,8 +2,8 @@ package com.sprintform.interview.budgetplanner.interfaces;
 
 import com.sprintform.interview.budgetplanner.application.TransactionService;
 import com.sprintform.interview.budgetplanner.application.model.TransactionInput;
-import com.sprintform.interview.budgetplanner.domain.model.Category;
-import com.sprintform.interview.budgetplanner.domain.model.Transaction;
+import com.sprintform.interview.budgetplanner.domain.model.enums.Category;
+import com.sprintform.interview.budgetplanner.domain.model.entites.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

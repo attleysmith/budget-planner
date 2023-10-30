@@ -1,7 +1,7 @@
 package com.sprintform.interview.budgetplanner.application.mappers;
 
 import com.sprintform.interview.budgetplanner.application.model.TransactionInput;
-import com.sprintform.interview.budgetplanner.domain.model.Transaction;
+import com.sprintform.interview.budgetplanner.domain.model.entites.Transaction;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 

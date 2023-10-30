@@ -1,7 +1,7 @@
-package com.sprintform.interview.budgetplanner.application.model;
+package com.sprintform.interview.budgetplanner.domain.model.dtos;
 
-import com.sprintform.interview.budgetplanner.domain.model.Category;
-import com.sprintform.interview.budgetplanner.domain.model.Currency;
+import com.sprintform.interview.budgetplanner.domain.model.enums.Category;
+import com.sprintform.interview.budgetplanner.domain.model.enums.Currency;
 import lombok.Builder;
 import lombok.Data;
 

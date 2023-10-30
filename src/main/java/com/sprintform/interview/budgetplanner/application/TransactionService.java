@@ -2,8 +2,8 @@ package com.sprintform.interview.budgetplanner.application;
 
 import com.sprintform.interview.budgetplanner.application.mappers.TransactionMapper;
 import com.sprintform.interview.budgetplanner.application.model.TransactionInput;
-import com.sprintform.interview.budgetplanner.domain.model.Category;
-import com.sprintform.interview.budgetplanner.domain.model.Transaction;
+import com.sprintform.interview.budgetplanner.domain.model.enums.Category;
+import com.sprintform.interview.budgetplanner.domain.model.entites.Transaction;
 import com.sprintform.interview.budgetplanner.domain.services.ReferenceGenerator;
 import com.sprintform.interview.budgetplanner.infrastructure.TransactionRepository;
 import jakarta.persistence.EntityNotFoundException;

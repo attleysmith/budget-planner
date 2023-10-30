@@ -1,6 +1,6 @@
 package com.sprintform.interview.budgetplanner.application;
 
-import com.sprintform.interview.budgetplanner.application.model.BudgetPlan;
+import com.sprintform.interview.budgetplanner.domain.model.dtos.BudgetPlan;
 import com.sprintform.interview.budgetplanner.domain.services.Planner;
 import com.sprintform.interview.budgetplanner.infrastructure.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;

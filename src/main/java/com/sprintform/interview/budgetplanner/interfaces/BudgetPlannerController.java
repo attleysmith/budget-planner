@@ -1,7 +1,7 @@
 package com.sprintform.interview.budgetplanner.interfaces;
 
 import com.sprintform.interview.budgetplanner.application.BudgetPlannerService;
-import com.sprintform.interview.budgetplanner.application.model.BudgetPlan;
+import com.sprintform.interview.budgetplanner.domain.model.dtos.BudgetPlan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;

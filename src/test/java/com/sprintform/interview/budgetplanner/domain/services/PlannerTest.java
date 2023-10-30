@@ -1,9 +1,9 @@
 package com.sprintform.interview.budgetplanner.domain.services;
 
-import com.sprintform.interview.budgetplanner.application.model.BudgetPlan;
-import com.sprintform.interview.budgetplanner.domain.model.Category;
-import com.sprintform.interview.budgetplanner.domain.model.Currency;
-import com.sprintform.interview.budgetplanner.domain.model.Transaction;
+import com.sprintform.interview.budgetplanner.domain.model.dtos.BudgetPlan;
+import com.sprintform.interview.budgetplanner.domain.model.entites.Transaction;
+import com.sprintform.interview.budgetplanner.domain.model.enums.Category;
+import com.sprintform.interview.budgetplanner.domain.model.enums.Currency;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -19,10 +19,10 @@ import java.util.function.Function;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static com.sprintform.interview.budgetplanner.domain.model.Category.miscellaneous;
-import static com.sprintform.interview.budgetplanner.domain.model.Category.travel;
-import static com.sprintform.interview.budgetplanner.domain.model.Currency.EUR;
-import static com.sprintform.interview.budgetplanner.domain.model.Currency.HUF;
+import static com.sprintform.interview.budgetplanner.domain.model.enums.Category.miscellaneous;
+import static com.sprintform.interview.budgetplanner.domain.model.enums.Category.travel;
+import static com.sprintform.interview.budgetplanner.domain.model.enums.Currency.EUR;
+import static com.sprintform.interview.budgetplanner.domain.model.enums.Currency.HUF;
 import static java.lang.Math.round;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
@@ -99,7 +99,7 @@ class PlannerTest {
         assertEquals(1, miscDetails.size());
         assertNotNull(miscDetails.get(HUF));
         // and
-        assertEquals(rationing(1000, rate), miscDetails.get(HUF));
+        assertEquals(round(1000 * rate), miscDetails.get(HUF));
     }
 
     @Test
@@ -153,15 +153,15 @@ class PlannerTest {
         assertEquals(1, miscDetails.size());
         assertNotNull(miscDetails.get(HUF));
         // and
-        assertEquals(rationing(1000, rate), miscDetails.get(HUF));
+        assertEquals(round(1000 * rate), miscDetails.get(HUF));
         // and
         Map<Currency, Integer> travelDetails = details.get(travel);
         assertEquals(2, travelDetails.size());
         assertNotNull(travelDetails.get(HUF));
         assertNotNull(travelDetails.get(EUR));
         // and
-        assertEquals(rationing(12000, rate), travelDetails.get(HUF));
-        assertEquals(rationing(500, rate), travelDetails.get(EUR));
+        assertEquals(round(12000 * rate), travelDetails.get(HUF));
+        assertEquals(round(500 * rate), travelDetails.get(EUR));
     }
 
     @Test
@@ -233,15 +233,15 @@ class PlannerTest {
         assertEquals(1, miscDetails.size());
         assertNotNull(miscDetails.get(HUF));
         // and
-        assertEquals(rationing(3000, rate), miscDetails.get(HUF));
+        assertEquals(round(3000 * rate), miscDetails.get(HUF));
         // and
         Map<Currency, Integer> travelDetails = details.get(travel);
         assertEquals(2, travelDetails.size());
         assertNotNull(travelDetails.get(HUF));
         assertNotNull(travelDetails.get(EUR));
         // and
-        assertEquals(rationing(12000, rate), travelDetails.get(HUF));
-        assertEquals(rationing(900, rate), travelDetails.get(EUR));
+        assertEquals(round(12000 * rate), travelDetails.get(HUF));
+        assertEquals(round(900 * rate), travelDetails.get(EUR));
     }
 
     @Test
@@ -281,10 +281,6 @@ class PlannerTest {
         assertEquals(1, miscDetails.size());
         assertNotNull(miscDetails.get(HUF));
         // and
-        assertEquals(rationing(1000, rate), miscDetails.get(HUF));
-    }
-
-    private static int rationing(int sum, float rate) {
-        return round(sum * rate);
+        assertEquals(round(1000 * rate), miscDetails.get(HUF));
     }
 }

@@ -1,7 +1,7 @@
 package com.sprintform.interview.budgetplanner.domain.services;
 
-import com.sprintform.interview.budgetplanner.application.model.BudgetPlan;
-import com.sprintform.interview.budgetplanner.domain.model.Transaction;
+import com.sprintform.interview.budgetplanner.domain.model.dtos.BudgetPlan;
+import com.sprintform.interview.budgetplanner.domain.model.entites.Transaction;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
