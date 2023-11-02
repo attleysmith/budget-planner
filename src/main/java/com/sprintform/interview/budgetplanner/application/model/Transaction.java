@@ -1,7 +1,5 @@
-package com.sprintform.interview.budgetplanner.domain.model.entites;
+package com.sprintform.interview.budgetplanner.application.model;
 
-import com.sprintform.interview.budgetplanner.domain.model.enums.Category;
-import com.sprintform.interview.budgetplanner.domain.model.enums.Currency;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;

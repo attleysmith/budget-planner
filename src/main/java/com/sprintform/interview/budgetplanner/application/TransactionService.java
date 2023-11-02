@@ -1,13 +1,12 @@
 package com.sprintform.interview.budgetplanner.application;
 
 import com.sprintform.interview.budgetplanner.application.mappers.TransactionMapper;
+import com.sprintform.interview.budgetplanner.application.model.Category;
+import com.sprintform.interview.budgetplanner.application.model.Transaction;
 import com.sprintform.interview.budgetplanner.application.model.TransactionInput;
-import com.sprintform.interview.budgetplanner.domain.model.enums.Category;
-import com.sprintform.interview.budgetplanner.domain.model.entites.Transaction;
-import com.sprintform.interview.budgetplanner.domain.services.ReferenceGenerator;
-import com.sprintform.interview.budgetplanner.infrastructure.TransactionRepository;
+import com.sprintform.interview.budgetplanner.infrastructure.repositories.TransactionRepository;
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,21 +14,16 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 
+@RequiredArgsConstructor
 @Service
 public class TransactionService {
 
-    @Autowired
-    private TransactionMapper transactionMapper;
-    @Autowired
-    private ReferenceGenerator referenceGenerator;
-    @Autowired
-    private TransactionRepository transactionRepository;
+    private final TransactionMapper transactionMapper;
+    private final TransactionRepository transactionRepository;
 
     @Transactional
     public Transaction createTransaction(TransactionInput transactionInput) {
         Transaction transaction = transactionMapper.toTransaction(transactionInput);
-        transaction.setId(referenceGenerator.generate());
-
         return transactionRepository.save(transaction);
     }
 

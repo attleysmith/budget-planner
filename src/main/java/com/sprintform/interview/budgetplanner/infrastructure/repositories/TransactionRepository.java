@@ -1,7 +1,7 @@
-package com.sprintform.interview.budgetplanner.infrastructure;
+package com.sprintform.interview.budgetplanner.infrastructure.repositories;
 
-import com.sprintform.interview.budgetplanner.domain.model.enums.Category;
-import com.sprintform.interview.budgetplanner.domain.model.entites.Transaction;
+import com.sprintform.interview.budgetplanner.application.model.Category;
+import com.sprintform.interview.budgetplanner.application.model.Transaction;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

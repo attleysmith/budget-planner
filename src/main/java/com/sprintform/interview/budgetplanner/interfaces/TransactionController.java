@@ -1,29 +1,30 @@
 package com.sprintform.interview.budgetplanner.interfaces;
 
 import com.sprintform.interview.budgetplanner.application.TransactionService;
+import com.sprintform.interview.budgetplanner.application.model.Category;
+import com.sprintform.interview.budgetplanner.application.model.Transaction;
 import com.sprintform.interview.budgetplanner.application.model.TransactionInput;
-import com.sprintform.interview.budgetplanner.domain.model.enums.Category;
-import com.sprintform.interview.budgetplanner.domain.model.entites.Transaction;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping(path = "/transactions")
 public class TransactionController {
 
-    @Autowired
-    private TransactionService transactionService;
+    private final TransactionService transactionService;
 
     @PostMapping()
-    public Transaction createTransaction(@RequestBody TransactionInput transactionInput) {
+    public Transaction createTransaction(@RequestBody @Validated TransactionInput transactionInput) {
         return transactionService.createTransaction(transactionInput);
     }
 
     @PutMapping("/{id}")
-    public Transaction updateTransaction(@PathVariable String id, @RequestBody TransactionInput transactionInput) {
+    public Transaction updateTransaction(@PathVariable String id, @RequestBody @Validated TransactionInput transactionInput) {
         return transactionService.updateTransaction(id, transactionInput);
     }
 

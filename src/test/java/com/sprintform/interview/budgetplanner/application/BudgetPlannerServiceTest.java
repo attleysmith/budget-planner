@@ -1,55 +1,68 @@
-package com.sprintform.interview.budgetplanner.domain.services;
+package com.sprintform.interview.budgetplanner.application;
 
-import com.sprintform.interview.budgetplanner.domain.model.dtos.BudgetPlan;
-import com.sprintform.interview.budgetplanner.domain.model.entites.Transaction;
-import com.sprintform.interview.budgetplanner.domain.model.enums.Category;
-import com.sprintform.interview.budgetplanner.domain.model.enums.Currency;
+import com.sprintform.interview.budgetplanner.application.model.BudgetPlan;
+import com.sprintform.interview.budgetplanner.application.model.Category;
+import com.sprintform.interview.budgetplanner.application.model.Currency;
+import com.sprintform.interview.budgetplanner.application.model.Transaction;
+import com.sprintform.interview.budgetplanner.infrastructure.repositories.TransactionRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mock;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static com.sprintform.interview.budgetplanner.domain.model.enums.Category.miscellaneous;
-import static com.sprintform.interview.budgetplanner.domain.model.enums.Category.travel;
-import static com.sprintform.interview.budgetplanner.domain.model.enums.Currency.EUR;
-import static com.sprintform.interview.budgetplanner.domain.model.enums.Currency.HUF;
+import static com.sprintform.interview.budgetplanner.application.model.Category.miscellaneous;
+import static com.sprintform.interview.budgetplanner.application.model.Category.travel;
+import static com.sprintform.interview.budgetplanner.application.model.Currency.EUR;
+import static com.sprintform.interview.budgetplanner.application.model.Currency.HUF;
 import static java.lang.Math.round;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
+import static org.mockito.BDDMockito.given;
 
-class PlannerTest {
+@SpringBootTest
+class BudgetPlannerServiceTest {
 
-    private static final LocalDate TODAY = LocalDate.now();
     private static final short PREDICTED_DAYS = 30;
+    public static final short MIN_HISTORY_DAYS = 20;
+    private static final LocalDate TODAY = LocalDate.now();
+    private static final LocalDate END_DATE_OF_HISTORY_DATA = TODAY.minusDays(1);
 
-    private final Planner planner = new Planner();
+    @Mock
+    private TransactionRepository transactionRepository;
+
+    private BudgetPlannerService budgetPlannerService;
+
+    @BeforeEach
+    void setUp() {
+        budgetPlannerService = new BudgetPlannerService(transactionRepository);
+    }
 
     @ParameterizedTest
     @MethodSource("recentlyStartedSystem")
     @DisplayName("First recorded transaction must be at least 20 days before the base date of the plan")
     void recentlyStartedSystemCannotPredictPlan(LocalDate firstDate, Transaction transaction) {
-        // given
-        Function<LocalDate, LocalDate> firstDateProvider = defaultValue -> firstDate;
-        BiFunction<LocalDate, LocalDate, List<Transaction>> transactionListProvider = (startDate, endDate) ->
-                List.of(transaction);
+        given(transactionRepository.getFirstDate()).willReturn(Optional.of(firstDate));
+        given(transactionRepository.findByParams(null, firstDate, END_DATE_OF_HISTORY_DATA))
+                .willReturn(List.of(transaction));
 
         // expect
-        assertThrows(UnsupportedOperationException.class, () ->
-                planner.plan(TODAY, firstDateProvider, transactionListProvider));
+        assertThrows(UnsupportedOperationException.class, () -> budgetPlannerService.plan());
     }
 
     private static Stream<Arguments> recentlyStartedSystem() {
-        return IntStream.range(0, 20).mapToObj(days -> {
+        return IntStream.range(0, MIN_HISTORY_DAYS).mapToObj(days -> {
             LocalDate firstDate = TODAY.minusDays(days);
             Transaction transaction = Transaction.builder()
                     .id(UUID.randomUUID().toString())
@@ -67,9 +80,11 @@ class PlannerTest {
     @DisplayName("It's enough if the first transaction is recorded 20 days before the base date of the plan")
     void minimumSystemAgeResultsAPlan() {
         // given
-        int historyRange = 20;
+        int historyRange = MIN_HISTORY_DAYS;
         float rate = (float) PREDICTED_DAYS / historyRange;
         LocalDate firstDate = TODAY.minusDays(historyRange);
+        // and
+        given(transactionRepository.getFirstDate()).willReturn(Optional.of(firstDate));
         // and
         Transaction transaction = Transaction.builder()
                 .id(UUID.randomUUID().toString())
@@ -80,12 +95,11 @@ class PlannerTest {
                 .paid(firstDate)
                 .build();
         // and
-        Function<LocalDate, LocalDate> firstDateProvider = defaultValue -> firstDate;
-        BiFunction<LocalDate, LocalDate, List<Transaction>> transactionListProvider = (startDate, endDate) ->
-                List.of(transaction);
+        given(transactionRepository.findByParams(null, firstDate, END_DATE_OF_HISTORY_DATA))
+                .willReturn(List.of(transaction));
 
         // when
-        BudgetPlan plan = planner.plan(TODAY, firstDateProvider, transactionListProvider);
+        BudgetPlan plan = budgetPlannerService.plan();
 
         // then
         assertEquals(TODAY, plan.getStartDate());
@@ -109,6 +123,8 @@ class PlannerTest {
         float rate = (float) PREDICTED_DAYS / historyRange;
         LocalDate firstDate = TODAY.minusDays(historyRange);
         //and
+        given(transactionRepository.getFirstDate()).willReturn(Optional.of(firstDate));
+        // and
         Transaction miscTransaction = Transaction.builder()
                 .id(UUID.randomUUID().toString())
                 .category(miscellaneous)
@@ -136,12 +152,11 @@ class PlannerTest {
                 .paid(firstDate.plusDays(20))
                 .build();
         // and
-        Function<LocalDate, LocalDate> firstDateProvider = defaultValue -> firstDate;
-        BiFunction<LocalDate, LocalDate, List<Transaction>> transactionListProvider = (startDate, endDate) ->
-                List.of(miscTransaction, travelTransaction1, travelTransaction2);
+        given(transactionRepository.findByParams(null, firstDate, END_DATE_OF_HISTORY_DATA))
+                .willReturn(List.of(miscTransaction, travelTransaction1, travelTransaction2));
 
         // when
-        BudgetPlan plan = planner.plan(TODAY, firstDateProvider, transactionListProvider);
+        BudgetPlan plan = budgetPlannerService.plan();
 
         // then
         Map<Category, Map<Currency, Integer>> details = plan.getDetails();
@@ -170,6 +185,8 @@ class PlannerTest {
         int historyRange = 45;
         float rate = (float) PREDICTED_DAYS / historyRange;
         LocalDate firstDate = TODAY.minusDays(historyRange);
+        //and
+        given(transactionRepository.getFirstDate()).willReturn(Optional.of(firstDate));
         //and
         Transaction miscTransaction1 = Transaction.builder()
                 .id(UUID.randomUUID().toString())
@@ -215,13 +232,11 @@ class PlannerTest {
                 .currency(EUR)
                 .paid(firstDate.plusDays(25))
                 .build();
-        // and
-        Function<LocalDate, LocalDate> firstDateProvider = defaultValue -> firstDate;
-        BiFunction<LocalDate, LocalDate, List<Transaction>> transactionListProvider = (startDate, endDate) ->
-                List.of(miscTransaction1, miscTransaction2, travelTransaction1, travelTransaction2, travelTransaction3);
+        given(transactionRepository.findByParams(null, firstDate, END_DATE_OF_HISTORY_DATA))
+                .willReturn(List.of(miscTransaction1, miscTransaction2, travelTransaction1, travelTransaction2, travelTransaction3));
 
         // when
-        BudgetPlan plan = planner.plan(TODAY, firstDateProvider, transactionListProvider);
+        BudgetPlan plan = budgetPlannerService.plan();
 
         // then
         Map<Category, Map<Currency, Integer>> details = plan.getDetails();
@@ -242,45 +257,5 @@ class PlannerTest {
         // and
         assertEquals(round(12000 * rate), travelDetails.get(HUF));
         assertEquals(round(900 * rate), travelDetails.get(EUR));
-    }
-
-    @Test
-    void baseDateCanBeOtherThanToday() {
-        // given
-        LocalDate baseDate = TODAY.minusDays(1);
-        // and
-        int historyRange = 20;
-        float rate = (float) PREDICTED_DAYS / historyRange;
-        LocalDate firstDate = baseDate.minusDays(historyRange);
-        // and
-        Transaction transaction = Transaction.builder()
-                .id(UUID.randomUUID().toString())
-                .category(miscellaneous)
-                .summary("first transaction")
-                .sum(1000)
-                .currency(HUF)
-                .paid(firstDate)
-                .build();
-        // and
-        Function<LocalDate, LocalDate> firstDateProvider = defaultValue -> firstDate;
-        BiFunction<LocalDate, LocalDate, List<Transaction>> transactionListProvider = (startDate, endDate) ->
-                List.of(transaction);
-
-        // when
-        BudgetPlan plan = planner.plan(baseDate, firstDateProvider, transactionListProvider);
-
-        // then
-        assertEquals(baseDate, plan.getStartDate());
-        assertEquals(baseDate.plusDays(PREDICTED_DAYS - 1), plan.getEndDate());
-        // and
-        Map<Category, Map<Currency, Integer>> details = plan.getDetails();
-        assertEquals(1, details.size());
-        assertNotNull(details.get(miscellaneous));
-        // and
-        Map<Currency, Integer> miscDetails = details.get(miscellaneous);
-        assertEquals(1, miscDetails.size());
-        assertNotNull(miscDetails.get(HUF));
-        // and
-        assertEquals(round(1000 * rate), miscDetails.get(HUF));
     }
 }
