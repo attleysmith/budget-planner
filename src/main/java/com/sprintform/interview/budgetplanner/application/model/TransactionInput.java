@@ -16,6 +16,7 @@ public class TransactionInput {
     private String summary;
     @NotNull(message = "Category may not be null")
     private Category category;
+    @NotNull(message = "Sum may not be null")
     @Positive(message = "Sum must be a positive value")
     private int sum;
     @NotNull(message = "Currency may not be null")
