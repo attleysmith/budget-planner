@@ -30,12 +30,15 @@ import static java.lang.Math.round;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.times;
 
 @SpringBootTest
 class BudgetPlannerServiceTest {
 
-    private static final short PREDICTED_DAYS = 30;
     public static final short MIN_HISTORY_DAYS = 20;
+    public static final short MAX_HISTORY_DAYS = 365;
+    private static final short PREDICTED_DAYS = 30;
     private static final LocalDate TODAY = LocalDate.now();
     private static final LocalDate END_DATE_OF_HISTORY_DATA = TODAY.minusDays(1);
 
@@ -114,6 +117,25 @@ class BudgetPlannerServiceTest {
         assertNotNull(miscDetails.get(HUF));
         // and
         assertEquals(round(1000 * rate), miscDetails.get(HUF));
+    }
+
+    @Test
+    @DisplayName("Only transactions in the last 365 days are considered when calculating a plan")
+    void maximumAYearIsConsideredIntoAPlan() {
+        // given
+        int historyRange = MAX_HISTORY_DAYS + 1;
+        LocalDate firstDate = TODAY.minusDays(historyRange);
+        // and
+        given(transactionRepository.getFirstDate()).willReturn(Optional.of(firstDate));
+
+        // when
+        budgetPlannerService.plan();
+
+        // expect
+        then(transactionRepository).should(times(0))
+                .findByParams(null, firstDate, END_DATE_OF_HISTORY_DATA);
+        then(transactionRepository).should(times(1))
+                .findByParams(null, TODAY.minusDays(MAX_HISTORY_DAYS), END_DATE_OF_HISTORY_DATA);
     }
 
     @Test
